@@ -1,0 +1,48 @@
+POST http://localhost:5000/users
+Content-Type: application/json
+
+{
+  "name": "RahulAgrawal"
+}
+###
+
+GET http://localhost:5000/users
+
+###
+POST http://localhost:5000/todos
+Content-Type: application/json
+
+{
+  "name": "sample",
+	"id": "1",
+	"createdBy": {
+    "name": "RahulAgrawal",
+    "id": "1"
+  },
+	"assign": {
+    "name": "RahulAgrawal",
+    "id": "1"
+  },
+	"status": ""
+}
+
+###
+GET http://localhost:5000/todos/1
+
+###
+PUT http://localhost:5000/todos/1
+Content-Type: application/json
+
+{
+  "name": "sample",
+	"id": "1",
+	"createdBy": {
+    "name": "RahulAgrawal",
+    "id": "1"
+  },
+	"assign": {
+    "name": "RahulAgrawal",
+    "id": "1"
+  },
+	"status": "Started"
+}
