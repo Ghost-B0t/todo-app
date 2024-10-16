@@ -6,15 +6,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"myapp.com/todo/user"
+	// "myapp.com/todo/user"
+	"myapp.com/todo/database"
 )
 
 type Todo struct {
 	gorm.Model
 	Name string `json:"name"`
 	// ID uint64 `json:"id" gorm:"unique;primaryKey;autoIncrement"`
-	CreatedBy uint `json:"createdBy" gorm:"unique;primaryKey;autoIncrement"`
-	Assign uint `json:"assign" gorm:"unique;primaryKey;autoIncrement"`
+	CreatedBy uint `json:"createdBy"`
+	Assign uint `json:"assign"`
 	Status string `json:"status"`
 }
 
@@ -28,32 +29,30 @@ func CreateTodo(c *gin.Context){
 		})
 		return
 	}
-	if !user.CheckUser(todo.Assign) {
-		c.JSON(http.StatusBadRequest,gin.H{
-			"error": "assigned user doesn't exist",
-		})
-		return
+	if err := database.Create(&todo); err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error": err.Error()})
 	}
-	todos = append(todos, todo)
 	c.JSON(http.StatusCreated,todo)
 }
 
 func GetTodo(c *gin.Context){
-	c.JSON(http.StatusOK,todos)
+	var todos []Todo
+	if err := database.Get(&todos); err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error": err.Error()})
+	}
+	c.JSON(http.StatusOK, todos)
 }
 
 func GetTodoById(c *gin.Context){
+	var todo Todo
 	todoId, err := strconv.ParseUint(c.Param("id"),10,64)
 	if err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error": err.Error()})
 	}
-	for _,todo := range(todos){
-		if uint64(todo.ID) == todoId{
-			c.JSON(http.StatusOK,todo)
-			return
-		}
+	if err := database.Get(&todo, todoId); err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusNotFound,gin.H{"error": "no such todo exists"})
+	c.JSON(http.StatusOK, todo)
 }
 
 func ListUserTodo(c *gin.Context){
@@ -61,17 +60,17 @@ func ListUserTodo(c *gin.Context){
 	if err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error": err.Error()})
 	}
-	myTodo := []Todo{}
-	for _,todo := range todos {
-		if uint64(todo.Assign) == userID {
-			myTodo = append(myTodo,todo)
-		}
+	var userTodos []Todo
+	// myTodo := []Todo{}
+	if err := database.Get(&userTodos, &Todo{Assign: uint(userID)}); err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK,myTodo)
+	c.JSON(http.StatusOK,userTodos)
 }
 
 func UpdateTodo(c *gin.Context){
-	id, err := strconv.ParseUint(c.Param("id"),10,64)
+	todoId, err := strconv.ParseUint(c.Param("id"),10,64)
+	// id := c.GetUint("id")
 	if err!=nil{
 		c.JSON(http.StatusBadRequest,gin.H{"error": err.Error()})
 	}
@@ -80,12 +79,12 @@ func UpdateTodo(c *gin.Context){
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	for index:= range(todos){
-		if uint64(todos[index].ID) == id{
-			todos[index] = newTodo
-		}
+	var todo Todo
+	if err := database.Get(&todo, todoId); err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error": err.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "todo updated successfully"})
+	_ = database.Update(&todo,newTodo)
+	c.JSON(http.StatusOK, todo)
 }
 
 func DeleteTodo(){

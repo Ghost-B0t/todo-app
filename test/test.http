@@ -1,33 +1,36 @@
+### Create User
 POST http://localhost:5000/users
 Content-Type: application/json
 
 {
   "name": "RahulAgrawal"
 }
-###
 
+### Get User list
 GET http://localhost:5000/users
+
+### Get User By ID
+GET http://localhost:5000/users/2
 
 ###
 POST http://localhost:5000/todos
 Content-Type: application/json
 
 {
-  "name": "sample",
-	"id": "1",
-	"createdBy": {
-    "name": "RahulAgrawal",
-    "id": "1"
-  },
-	"assign": {
-    "name": "RahulAgrawal",
-    "id": "1"
-  },
+  "name": "sample2",
+	"createdBy": 1,
+	"assign": 2,
 	"status": ""
 }
 
 ###
-GET http://localhost:5000/todos/1
+GET http://localhost:5000/todos
+
+### Get todo by ID
+GET http://localhost:5000/todos/4
+
+### Get todo by user
+GET http://localhost:5000/users/2/todos
 
 ###
 PUT http://localhost:5000/todos/1
@@ -35,14 +38,5 @@ Content-Type: application/json
 
 {
   "name": "sample",
-	"id": "1",
-	"createdBy": {
-    "name": "RahulAgrawal",
-    "id": "1"
-  },
-	"assign": {
-    "name": "RahulAgrawal",
-    "id": "1"
-  },
-	"status": "Started"
+	"status": "Done"
 }

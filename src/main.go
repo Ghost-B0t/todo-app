@@ -19,6 +19,7 @@ func main() {
 	server := gin.New()
 
 	server.GET("/users",user.GetUsers)
+	server.GET("/users/:id",user.GetUserById)
 	server.POST("/users",user.CreateUser)
 
 	server.POST("/todos",todo.CreateTodo)

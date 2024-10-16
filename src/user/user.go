@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -13,8 +14,6 @@ type User struct {
 	Name string `json:"name"`
 }
 
-var users = []User{}
-
 func CreateUser(c *gin.Context){
 	var user User
 	if err := c.ShouldBindJSON(&user); err!=nil {
@@ -23,21 +22,28 @@ func CreateUser(c *gin.Context){
 		})
 		return
 	}
-	_ = database.Create(&user)
+	if err := database.Create(&user); err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error": err.Error()})
+	}
 	c.JSON(http.StatusCreated, user)
 }
 
 func GetUsers(c *gin.Context) {
 	var users []User
-	_ = database.Get(&users)
+	if err := database.Get(&users); err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error": err.Error()})
+	}
 	c.JSON(http.StatusOK, users)
 }
 
-func CheckUser(uid uint) bool{
-	for _, user := range(users) {
-		if user.ID == uid{
-			return true
-		}
+func GetUserById(c *gin.Context) {
+	var user User
+	userId, err := strconv.ParseUint(c.Param("id"),10,64)
+	if err != nil{
+		c.JSON(http.StatusBadRequest,gin.H{"error": err.Error()})
 	}
-	return false
+	if err := database.Get(&user, userId); err != nil{
+		c.JSON(http.StatusInternalServerError,gin.H{"error": err.Error()})
+	}
+	c.JSON(http.StatusOK, user)
 }

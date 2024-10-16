@@ -35,3 +35,10 @@ func Create(obj interface{}, conditions ...interface{}) (error){
 	}
 	return nil
 }
+
+func Update(obj interface{}, newVal interface{}) error {
+	if result := db.Model(obj).Updates(newVal); result.Error!=nil{
+		return result.Error
+	}
+	return nil
+}
