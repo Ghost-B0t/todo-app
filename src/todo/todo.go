@@ -19,8 +19,6 @@ type Todo struct {
 	Status string `json:"status"`
 }
 
-var todos = []Todo{}
-
 func CreateTodo(c *gin.Context){
 	var todo Todo
 	if err:= c.ShouldBindJSON(&todo); err!=nil{
@@ -61,7 +59,6 @@ func ListUserTodo(c *gin.Context){
 		c.JSON(http.StatusBadRequest,gin.H{"error": err.Error()})
 	}
 	var userTodos []Todo
-	// myTodo := []Todo{}
 	if err := database.Get(&userTodos, &Todo{Assign: uint(userID)}); err != nil{
 		c.JSON(http.StatusInternalServerError,gin.H{"error": err.Error()})
 	}
