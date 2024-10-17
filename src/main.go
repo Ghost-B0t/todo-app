@@ -9,8 +9,8 @@ import (
 )
 
 func main() {
-	
-	if err := database.CreateConnection("test.db",&user.User{},&todo.Todo{}); err != nil{
+	db := database.GetDatabase()
+	if err := db.CreateConnection("test.db",&user.User{},&todo.Todo{}); err != nil{
 		panic(err.Error())
 	} else {
 		fmt.Println("Connection to database established")
