@@ -11,10 +11,10 @@ import (
 
 type Todo struct {
 	gorm.Model
-	Name string `json:"name"`
-	CreatedBy uint `json:"createdBy"`
+	Name string `json:"name" binding:"required"`
+	CreatedBy uint `json:"createdBy" binding:"required"`
 	Assign uint `json:"assign"`
-	Status string `json:"status"`
+	Status string `json:"status" form:"status,default=Todo"`
 }
 
 func CreateTodo(c *gin.Context){

@@ -11,7 +11,7 @@ import (
 
 type User struct {
 	gorm.Model
-	Name string `json:"name"`
+	Name string `json:"name" binding:"required"`
 }
 
 func CreateUser(c *gin.Context){
