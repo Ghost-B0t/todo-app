@@ -7,37 +7,48 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+type Database struct{
+	db *gorm.DB
+}
 
-func CreateConnection(url string, tables ...interface{}) error{
-	if db!=nil{
+var data *Database
+
+func(self *Database) CreateConnection(url string, tables ...interface{}) error{
+	if self.db!=nil{
 		return nil
 	}
-	database, err := gorm.Open(sqlite.Open(url), &gorm.Config{});
+	dba, err := gorm.Open(sqlite.Open(url), &gorm.Config{});
 	if err != nil{
 		return errors.New("failed to connect to database")
 	}
-	db = database
-	db.AutoMigrate(tables...)
+	self.db = dba
+	self.db.AutoMigrate(tables...)
 	return nil
 }
 
-func Get(obj interface{}, conditions ...interface{}) (error){
-	if result := db.Find(obj, conditions...); result.Error!=nil{
+func GetDatabase() *Database{
+	if data==nil{
+		data = &Database{}
+	}
+	return data
+}
+
+func(self *Database) Get(obj interface{}, conditions ...interface{}) (error){
+	if result := self.db.Find(obj, conditions...); result.Error!=nil{
 		return result.Error
 	}
 	return nil
 }
 
-func Create(obj interface{}, conditions ...interface{}) (error){
-	if result := db.Create(obj); result.Error!=nil{
+func(self *Database) Create(obj interface{}, conditions ...interface{}) (error){
+	if result := self.db.Create(obj); result.Error!=nil{
 		return result.Error
 	}
 	return nil
 }
 
-func Update(obj interface{}, newVal interface{}) error {
-	if result := db.Model(obj).Updates(newVal); result.Error!=nil{
+func(self *Database) Update(obj interface{}, newVal interface{}) error {
+	if result := self.db.Model(obj).Updates(newVal); result.Error!=nil{
 		return result.Error
 	}
 	return nil
